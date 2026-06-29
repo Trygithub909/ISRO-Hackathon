@@ -1,0 +1,356 @@
+# Installation & Project Execution Guide
+
+ Step 1: Clone the Repository
+
+bash-Commands
+
+git clone <repository_url>
+cd IR_Colorization_Project
+
+
+## Step 2: Install Required Libraries
+
+bash-Commands
+
+pip install torch torchvision torchaudio
+pip install numpy opencv-python matplotlib pillow tqdm pandas
+pip install ultralytics tensorboard
+
+
+Verify installation:
+
+bash-Commands
+
+python -c "import torch; print(torch.__version__)"
+python -c "import torch; print(torch.cuda.is_available())"
+
+
+
+
+# Project Workflow
+
+## Phase 0 – Data Acquisition
+
+Purpose:
+
+* Download and prepare paired IR and RGB satellite imagery.
+
+File:
+
+bash-Commands
+
+phase0_data_download.py
+
+
+
+Run:
+
+bash-Commands
+
+python phase0_data_download.py
+
+
+Output:
+
+raw_data/
+├── ir/
+└── rgb/
+
+
+## Phase 1 – Dataset Preparation
+
+Purpose:
+
+* Match IR and RGB images.
+* Generate training patches.
+* Create train/validation/test splits.
+
+File:
+
+bash-Commands
+
+phase1_dataset_preparation.py
+
+
+Run:
+
+bash-Commands
+
+python phase1_dataset_preparation.py --ir_dir raw_data/ir --rgb_dir raw_data/rgb --output_dir dataset_patches --patch_size 128 --stride 64
+
+
+Output:
+
+
+dataset_patches/
+├── train/
+├── val/
+├── test/
+└── manifest.json
+
+
+
+
+## Phase 2 – Infrared Image Enhancement
+
+Purpose:
+
+* Improve IR image quality using:
+
+  * CLAHE
+  * Gamma Correction
+  * Bilateral Filtering
+  * Unsharp Masking
+
+File:
+
+bash-Commands
+
+phase2_enhancement.py
+
+
+Run:
+
+bash-Commands
+
+python phase2_enhancement.py input_image.png
+
+
+Output:
+
+
+enhanced_ir.png
+pipeline_viz.png
+
+
+
+
+## Phase 3 – Generator Network
+
+Purpose:
+
+* Residual U-Net Generator
+* CBAM Attention
+* Skip Attention Gates
+* IR → RGB Translation
+
+File:
+
+bash-Commands
+
+phase3_generator.py
+
+
+Run:
+
+bash-Commands
+
+python phase3_generator.py
+
+
+Output:
+
+Generator parameters
+Input shape
+Output shape
+
+
+## Phase 4 – Loss Functions
+
+Purpose:
+
+* GAN Loss
+* L1 Loss
+* Perceptual Loss (VGG19)
+* SSIM Loss
+* Edge Loss
+
+File:
+
+bash-Commands
+
+phase4_losses.py
+
+
+Run:
+
+bash-Commands
+
+python phase4_losses.py
+
+
+## Phase 5 – Discriminator Network
+
+Purpose:
+
+* Multi-Scale PatchGAN Discriminator
+* Real/Fake Image Classification
+
+File:
+
+bash-Commands
+
+phase5_discriminator.py
+
+
+Run:
+
+bash-Commands
+
+python phase5_discriminator.py
+
+
+Output:
+
+
+Discriminator verification
+
+## Phase 6 – GAN Training
+
+Purpose:
+
+* Train Generator and Discriminator.
+* Save checkpoints.
+* Log training progress.
+
+File:
+
+bash-Commands
+
+phase6_train.py
+
+
+Run:
+
+bash-Commands
+
+python phase6_train.py --epochs 5
+
+
+Monitor GPU:
+
+bash-Commands
+nvidia-smi
+
+Output:
+
+
+checkpoints/
+runs/
+
+
+
+## Phase 7 – Model Evaluation
+
+Purpose:
+
+* Evaluate generated RGB images.
+
+Metrics:
+
+* PSNR
+* SSIM
+* LPIPS
+
+File:
+
+phase7_evaluation.py
+
+
+Run:
+
+bash-Commands
+
+python phase7_evaluation.py --manifest dataset_patches/manifest.json --checkpoint checkpoints/best_model.pth
+
+Output:
+
+
+evaluation_results.csv
+
+
+## Phase 8 – Object Detection Analysis
+
+Purpose:
+
+* Detect roads, vehicles, buildings, and other objects.
+* Compare performance before and after colorization.
+
+File:
+
+
+phase8_object_detection.py
+
+
+Run:
+
+bash-Commands
+
+python phase8_object_detection.py
+
+
+Output:
+
+
+Detection comparison results
+
+
+
+## Phase 9 – Inference
+
+Purpose:
+
+* Generate RGB images from unseen IR images.
+
+File:
+
+phase9_inference.py
+
+
+Run:
+
+bash-Commands
+
+python phase9_inference.py
+
+
+Output:
+
+
+Generated RGB Images
+
+
+
+
+## Phase 10 – Demo
+
+Purpose:
+
+* Demonstrate the complete pipeline.
+
+File:
+
+
+phase10_demo.py
+
+
+Run:
+
+bash-Commands
+
+python phase10_demo.py
+
+
+Output:
+
+
+End-to-end demonstration
+
+
+
+
+# Note
+
+This repository contains only the core source code. Training datasets, generated patches, model checkpoints, 
+logs, and other large files are not included due to GitHub storage limitations. Users can reproduce the complete
+workflow by preparing the dataset and running the phases in sequence.
